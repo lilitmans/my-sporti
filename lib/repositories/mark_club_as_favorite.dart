@@ -4,7 +4,24 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class MarkClubAsFavorite extends ChangeNotifier {
   List<dynamic> favoriteClubs = [];
-  String _favoriteClub;
+  String _favoriteClub = "";
+  String clubFavoriteKey = 'clubFavorite';
+  String clubFavorite = "";
+  bool clubIsFav;
+
+  void readFavorite() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    clubFavorite = prefs.getString(clubFavoriteKey);
+    if (clubFavorite == null) clubFavorite = "";
+  }
+
+  bool isClubFavorite(String clubId) {
+    if (clubId != null) {
+      return _favoriteClub.contains(";" + clubId + ";");
+    } else {
+      return false;
+    }
+  }
 
   void markClubAsFavorite(String clubId) async {
 //    bool clubIsFav = false;
@@ -28,23 +45,12 @@ class MarkClubAsFavorite extends ChangeNotifier {
 
     prefs.setString(_clubFavKey, _favoriteClub);
 
-    bool clubIsFav = _favoriteClub.contains(";" + clubId + ";");
+    clubIsFav = _favoriteClub.contains(";" + clubId + ";");
     print("5 $_favoriteClub $clubIsFav");
 //    favoriteClubs.add(value);
     notifyListeners();
   }
 
-  bool isClubFavorite(String clubId) {
-    if (clubId != null) {
-      return _favoriteClub.contains(";" + clubId + ";");
-    } else {
-      return false;
-    }
-  }
 //
-//  void readFavorite() async {
-//    SharedPreferences prefs = await SharedPreferences.getInstance();
-//    _favoriteClub = prefs.getString(_clubFavKey);
-//    if (_favoriteClub == null) _favoriteClub = "";
-//  }
+
 }

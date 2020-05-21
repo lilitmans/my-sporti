@@ -5,39 +5,30 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/bloc.dart';
 import 'time_selection_screen.dart';
+import '../repositories/repositories.dart';
 
 class CourtTypeSelectionScreen extends StatelessWidget {
   final Map<String, dynamic> club;
   final String clubId;
   CourtTypeSelectionScreen({this.club, this.clubId});
 
-  thereIsClubImage() {
-    if (club["image_url_bottom_left"] == "") {
-      if (club["image_url_bottom_right"] == "") {
-        return Container();
-      } else {
-        return Image.network(club["image_url_bottom_right"]);
-      }
-    } else {
-      return Image.network(club["image_url_bottom_left"]);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    MarkClubAsFavorite markClubAsFavorite = MarkClubAsFavorite();
+    markClubAsFavorite.markClubAsFavorite(club["id"]);
+    bool _clubIsFav = markClubAsFavorite.clubIsFav;
+//    print(_clubIsFav);
+
     return Scaffold(
-      appBar: AppBar(
-        title: appBar(context, club["name"]),
-//          actions: <Widget>[
-//            (_clubIsFavorite ? new Icon(Icons.favorite) : new Container())
-//          ]),
-      ),
+      appBar: AppBar(title: appBar(context, club["name"]), actions: <Widget>[
+        (_clubIsFav ? new Icon(Icons.favorite) : new Container())
+      ]),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             GroundTypesList(club: club, clubId: clubId),
-            thereIsClubImage(),
+            thereIsClubImage(club),
           ],
         ),
       ),
@@ -97,6 +88,8 @@ class GroundTypesList extends StatelessWidget {
                           MaterialPageRoute(
                             builder: (context) => TimeSelectionScreen(
                               club: club,
+                              groundName: state
+                                  .groundTypesList.groundTypesList[i]["name"],
 //                              clubId: clubId,
 //                              groundTypeId: groundTypeId,
                             ),

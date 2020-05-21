@@ -7,8 +7,8 @@ import '../bloc/bloc.dart';
 import 'court_type_selection_screen.dart';
 import 'time_selection_screen.dart';
 import 'package:provider/provider.dart';
-import '../repositories/mark_club_as_favorite.dart';
-import 'splash_screen.dart';
+import '../repositories/repositories.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 var _filter;
 bool _isInputValueMatch = false;
@@ -25,6 +25,14 @@ class _ClubSelectionScreenState extends State<ClubSelectionScreen> {
   void initState() {
     super.initState();
     _myController.addListener(_isSearchValueMatch);
+    getids();
+  }
+
+  void getids() async {
+    String _clubFavKey;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var xx = prefs.getString(_clubFavKey);
+    print("favorite $xx");
   }
 
   _isSearchValueMatch() {
@@ -97,9 +105,11 @@ class ClubsItemList extends StatelessWidget {
     return BlocBuilder<ClubsListBloc, ClubsListState>(
       builder: (context, state) {
         if (state is ClubsListEmpty) {
+          favoriteClub.readFavorite();
           BlocProvider.of<ClubsListBloc>(context).add(FetchClubsList());
         }
         if (state is ClubsListError) {
+          favoriteClub.readFavorite();
           return Center(
             child: Text('Failed to fetch clubs list'),
           );
@@ -116,16 +126,13 @@ class ClubsItemList extends StatelessWidget {
                 String clubName = clubs[i]["name"].toLowerCase();
                 String clubAddress = clubs[i]["address"].toLowerCase();
 
-//        readFavorite();
-                if (_isInputValueMatch == false
-//            && !_isClubFavorite
-                    ) {
+                favoriteClub.readFavorite();
+                if (_isInputValueMatch == false &&
+                    !favoriteClub.isClubFavorite(clubId)) {
                   return new Container();
                 } else if (clubName.contains(_filter.toLowerCase()) ||
-                        clubAddress.contains(_filter.toLowerCase())
-//            || isClubFavorite(clubId)
-                    ) {
-//                    clubId = clubId;
+                    clubAddress.contains(_filter.toLowerCase()) ||
+                    favoriteClub.isClubFavorite(clubId)) {
                   return SingleChildScrollView(
                     child: Hero(
                       tag: 'clubTag$i',
@@ -133,12 +140,13 @@ class ClubsItemList extends StatelessWidget {
                         title: Text(clubs[i]["name"]),
                         subtitle: Text(clubs[i]["address"]),
                         leading: IconButton(
-//                        icon: favoriteClub.isClubFavorite(clubId)
-//                            ? Icon(Icons.favorite)
-                          icon: Icon(Icons.favorite_border),
+                          icon: favoriteClub.isClubFavorite(clubId)
+                              ? Icon(Icons.favorite)
+                              : Icon(Icons.favorite_border),
                           onPressed: () {
-//                            favoriteClub.markClubAsFavorite(clubId);
-//                  markAsFavoriteClub(clubId);
+                            favoriteClub.markClubAsFavorite(clubId);
+                            favoriteClub.readFavorite();
+//                            _incrementCounter(clubId);
                           },
                         ),
                         trailing: Icon(clubs[i]["allow_booking"] == "1"
@@ -151,9 +159,12 @@ class ClubsItemList extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => TimeSelectionScreen(
-                                        club: clubs[i],
-                                      )),
+                                builder: (context) => TimeSelectionScreen(
+                                  club: clubs[i],
+                                  groundName: clubs[i]
+                                      ["ground_type__description"],
+                                ),
+                              ),
                             );
                           } else {
 //                          print(clubId);

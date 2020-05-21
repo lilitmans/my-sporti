@@ -12,7 +12,6 @@ import 'bloc/bloc.dart';
 import 'repositories/clubs_list_api_client.dart';
 import 'repositories/repositories.dart';
 import 'package:provider/provider.dart';
-import 'repositories/mark_club_as_favorite.dart';
 
 class SimpleBlocDelegate extends BlocDelegate {
   @override
@@ -45,12 +44,24 @@ void main() {
     ),
   );
 
+  final ConfirmationResponseListRepository confirmationResponseListRepository =
+      ConfirmationResponseListRepository(
+    confirmationResponseListApiClient: ConfirmationResponseListApiClient(
+      httpClient: http.Client(),
+    ),
+  );
+
+  tappedTimeList = [];
+//  readPinCookie();
+//  readFavorite();
+
   runApp(
     Phoenix(
       child: Application(
         clubsListRepository: clubsListRepository,
         groundTypesListRepository: groundTypesListRepository,
         reservationTimeListRepository: reservationTimeListRepository,
+        confirmationResponseListRepository: confirmationResponseListRepository,
       ),
     ),
   );
@@ -60,16 +71,17 @@ class Application extends StatelessWidget {
   final ClubsListRepository clubsListRepository;
   final GroundTypesListRepository groundTypesListRepository;
   final ReservationTimeListRepository reservationTimeListRepository;
+  final ConfirmationResponseListRepository confirmationResponseListRepository;
 
   Application({
     Key key,
     @required this.clubsListRepository,
     @required this.groundTypesListRepository,
     @required this.reservationTimeListRepository,
+    @required this.confirmationResponseListRepository,
   })  : assert(
           clubsListRepository != null,
           groundTypesListRepository != null,
-//  reservationTimeListRepository != null,
         ),
         super(key: key);
 
@@ -88,6 +100,10 @@ class Application extends StatelessWidget {
             create: (context) => ReservationTimeListBloc(
                 reservationTimeListRepository: reservationTimeListRepository)),
         ChangeNotifierProvider(create: (context) => MarkClubAsFavorite()),
+        BlocProvider(
+            create: (context) => ConfirmationResponseListBloc(
+                confirmationResponseListRepository:
+                    confirmationResponseListRepository)),
       ],
       child: MaterialApp(
         title: title,

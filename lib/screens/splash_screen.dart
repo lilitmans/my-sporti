@@ -3,6 +3,7 @@ import 'club_selection_screen.dart';
 import '../common/theme.dart';
 import '../common/app_bar.dart';
 import 'dart:async';
+import '../repositories/repositories.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -17,10 +18,9 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     new Future.delayed(
       const Duration(seconds: 3),
-      () => Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => ClubSelectionScreen()),
-      ),
+      () => Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => ClubSelectionScreen()),
+          (Route<dynamic> route) => false),
     );
   }
 
