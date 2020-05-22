@@ -8,65 +8,89 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/bloc.dart';
 import '../screens/reservation_contact_information_screen.dart';
 import '../screens/reservation-pin-screen.dart';
-import '../screens/time_selection_schedule.dart';
 import 'package:provider/provider.dart';
 
-_TimeSelectionScreenState _globalState  = _TimeSelectionScreenState();
-
+//_TimeSelectionScreenState _globalState = _TimeSelectionScreenState();
 class TimeSelectionScreen extends StatefulWidget {
   final Map<String, dynamic> club;
   final String groundName;
+  final String filter;
 
-  TimeSelectionScreen({this.club, this.groundName});
+  TimeSelectionScreen({this.club, this.groundName, this.filter});
 
   @override
+
   _TimeSelectionScreenState createState() => _TimeSelectionScreenState();
+//  _TimeSelectionScreenState _globalState = _TimeSelectionScreenState();
+//  _TimeSelectionScreenState createState() => _globalState;
+
 }
 
 class _TimeSelectionScreenState extends State<TimeSelectionScreen> {
   DateTime date;
-  String _tappedTime;
+  String tappedTime;
   String tappedTimeForServer;
-
+  List reservationTimeList;
+  String clubId;
   _TimeSelectionScreenState();
 
   @override
   void initState() {
+    print(StatefulWidget);
     date = DateTime.now().toLocal();
-    _tappedTime = "";
-    tappedTimeForServer = DateFormat('yyyy-MM-dd – kk:mm').format(date);
+    tappedTime = "";
+    tappedTimeForServer = "";
+    clubId = this.widget.club['id'];
+
+
     super.initState();
+
   }
 
-  thereIsClubImage() {
-    if (this.widget.club["image_url_bottom_left"] == "") {
-      if (this.widget.club["image_url_bottom_right"] == "") {
-        return Container();
-      } else {
-        return Image.network(this.widget.club["image_url_bottom_right"]);
-      }
-    } else {
-      return Image.network(this.widget.club["image_url_bottom_left"]);
-    }
+  void refresh(String tappedTimeChild, String tappedTimeForServerChild) {
+    print("refresh");
+    setState(() {
+      tappedTime = tappedTimeChild;
+      tappedTimeForServer = tappedTimeForServerChild;
+    });
   }
 
   @override
-  Widget build(BuildContext context) {
-    List reservationTimeList;
+  void deactivate() {
+//    reservationTimeList.removeLast();
+//      tappedTime.isEmpty;
+//      tappedTimeForServer.re;
 
+    super.deactivate();
+  }
+  bool status = true;
+
+  @override
+  Widget build(BuildContext context) {
+//    List reservationTimeList;
+  if(status) {
+    BlocProvider.of<ReservationTimeListBloc>(context).add(
+        FetchReservationTimeList(
+            clubId: clubId,
+            groundTypeId: this.widget.club["ground_type__id"],
+            date: date));
+
+      status = false;
+  }
     return Scaffold(
       appBar: AppBar(
         title: appBar(context, this.widget.club["name"]),
       ),
 //        actions: <Widget>[
 //        (clubIsFavorite ? new Icon(Icons.favorite) : new Container())
-//      ],);
+//      ],
       body: BlocBuilder<ReservationTimeListBloc, ReservationTimeListState>(
         builder: (context, state) {
           if (state is ReservationTimeListEmpty) {
+
             BlocProvider.of<ReservationTimeListBloc>(context).add(
                 FetchReservationTimeList(
-                    clubId: this.widget.club["id"],
+                    clubId: clubId,
                     groundTypeId: this.widget.club["ground_type__id"],
                     date: date));
           }
@@ -86,10 +110,13 @@ class _TimeSelectionScreenState extends State<TimeSelectionScreen> {
                       DatePicker.showDateTimePicker(context,
                           showTitleActions: true, onConfirm: (d) {
                         setState(() {
+                          print("dirty: $tappedTimeList, $tappedTime");
+                          tappedTimeList = [];
+                          tappedTime = "";
+                          print("clean: $tappedTimeList, $tappedTime");
                           date = d.toLocal();
-                          _tappedTime =
+                          tappedTime =
                               DateFormat('yyyy-MM-dd – kk:mm').format(date);
-
                           BlocProvider.of<ReservationTimeListBloc>(context).add(
                               FetchReservationTimeList(
                                   clubId: this.widget.club["id"],
@@ -101,16 +128,16 @@ class _TimeSelectionScreenState extends State<TimeSelectionScreen> {
                     },
                     child: Column(children: <Widget>[
                       Text("Datum und Uhrzeit auswählen"),
-                      Text(_tappedTime == ""
+                      Text(tappedTime == ""
                           ? DateFormat('yyyy-MM-dd – kk:mm').format(date)
-                          : _tappedTime)
+                          : tappedTime)
                     ]),
                   ),
                   TimeSelectionSchedule(
                     club: this.widget.club,
-                    reservationTimeList: reservationTimeList,
+                    reservationTimeList: reservationTimeList, notifyParent: refresh,
                   ),
-                  thereIsClubImage(),
+                  thereIsClubImage(this.widget.club),
                 ],
               ),
             );
@@ -134,7 +161,8 @@ class _TimeSelectionScreenState extends State<TimeSelectionScreen> {
                       builder: (context) => ReservationContactInformationScreen(
                         club: this.widget.club,
                         groundName: this.widget.groundName,
-                        tappedTime: _tappedTime,
+                        date: date,
+                        tappedTimeForServer: tappedTimeForServer,
                         reservationTimeList: reservationTimeList,
                       ),
                     ),
@@ -145,7 +173,8 @@ class _TimeSelectionScreenState extends State<TimeSelectionScreen> {
                     MaterialPageRoute(
                       builder: (context) => ReservationPinScreen(
                         club: this.widget.club,
-                        tappedTime: _tappedTime,
+                        date: date,
+                        tappedTimeForServer: tappedTimeForServer,
                         reservationTimeList: reservationTimeList,
                       ),
                     ),
@@ -173,25 +202,28 @@ class _TimeSelectionScreenState extends State<TimeSelectionScreen> {
 // Time Selection Schedule .....................................................
 
 class TimeSelectionSchedule extends StatefulWidget {
+  final Function(String tapT, String timeForServ) notifyParent;
+
   final Map<String, dynamic> club;
   final List reservationTimeList;
 
   TimeSelectionSchedule(
-      {this.club, this.reservationTimeList});
+      {Key key, this.club, this.reservationTimeList, @required this.notifyParent}) : super(key: key);
 
   @override
   _TimeSelectionScheduleState createState() => _TimeSelectionScheduleState();
 }
 
 class _TimeSelectionScheduleState extends State<TimeSelectionSchedule> {
-  String tappedTime;
   Color placeTimeBackgroundColor;
   Map<String, dynamic> thisGround;
+  String tappedTimeChild;
+  String tappedTimeForServerChild;
 
   @override
   void initState() {
-    tappedTime = "";
-//    this.widget.tappedTimeForServer = "";
+    tappedTimeChild = "";
+    tappedTimeForServerChild = "";
     super.initState();
   }
 
@@ -199,18 +231,30 @@ class _TimeSelectionScheduleState extends State<TimeSelectionSchedule> {
       String timeForServer) {
     if (free != "1") return;
 
-    _globalState.setState(() {
-      thisGround = ground;
-      if (tappedTime.split("|").contains(time)) {
-        tappedTime = tappedTime.replaceAll("|" + time + "|", "");
-        _globalState.tappedTimeForServer =  _globalState.tappedTimeForServer
-            .replaceAll("|" + timeForServer + "|", "");
-        print(_globalState.tappedTimeForServer);
+//      thisGround = ground;
+
+
+      if (tappedTimeChild.split("|").contains(time)) {
+
+        setState((){
+          tappedTimeChild = tappedTimeChild.replaceAll("|" + time + "|", "");
+          tappedTimeForServerChild = tappedTimeForServerChild.replaceAll("|" + timeForServer + "|", "");
+          print("111 tappedTimeChild $tappedTimeChild");
+          print("111 tappedTimeForServerChild $tappedTimeForServerChild");
+          widget.notifyParent(tappedTimeChild, tappedTimeForServerChild);
+        });
       } else {
-        tappedTime += "|" + time + "|";
-        _globalState.tappedTimeForServer += "|" + timeForServer + "|";
+
+        setState((){
+          tappedTimeChild += "|" + time + "|";
+          tappedTimeForServerChild += "|" + timeForServer + "|";
+          print("222 tappedTimeChild $tappedTimeChild");
+          print("222 tappedTimeForServerChild $tappedTimeForServerChild");
+          widget.notifyParent(tappedTimeChild, tappedTimeForServerChild);
+        });
+
       }
-    });
+
   }
 
   @override
@@ -219,7 +263,6 @@ class _TimeSelectionScheduleState extends State<TimeSelectionSchedule> {
     String resTime;
     String free;
     String placeTime;
-    String placeTimeForServer;
 
     return Expanded(
       child: new ListView.builder(
@@ -227,7 +270,6 @@ class _TimeSelectionScheduleState extends State<TimeSelectionSchedule> {
         itemBuilder: (BuildContext context, i) {
           String groundName = reservationTimeList[i]["name"];
           String groundId = reservationTimeList[i]["id"];
-//          print('tappedTime $tappedTime');
           return new ListTile(
             title: new Text("$groundName"),
             subtitle: GridView.builder(
@@ -237,25 +279,25 @@ class _TimeSelectionScheduleState extends State<TimeSelectionSchedule> {
                 gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 4, childAspectRatio: 2.5),
                 itemBuilder: (BuildContext context, int index) {
+
                   resTime = reservationTimeList[i]["times"][index]["hour"];
                   free = reservationTimeList[i]["times"][index]["free"];
                   placeTime = groundName + "." + resTime;
-                  placeTimeForServer = groundId + "." + resTime;
-                  var x = reservationTimeList[i]["times"][index]['hour'];
-//                  print("placeTime $placeTime");
-//                  print('tappedTime $tappedTime');
 
                   placeTimeBackgroundColor = Colors.black45;
-                  if (tappedTime.split("|").contains(placeTime)) {
-                    placeTimeBackgroundColor = Colors.orange;
-                    tappedTimeList = [];
-                    tappedTimeList.add(tappedTime);
-                    print('tappedTime $tappedTime');
-                  } else if (free == "1") {
-                    placeTimeBackgroundColor = Colors.green;
-                  } else if (free == "0") {
-                    placeTimeBackgroundColor = Colors.red;
-                  }
+                  print("tappedTimeChild: $free");
+//                  if(tappedTimeChild != null){
+                    if (tappedTimeChild.split("|").contains(placeTime)) {
+                      placeTimeBackgroundColor = Colors.orange;
+                      tappedTimeList = [];
+                      tappedTimeList.add(tappedTimeChild);
+                    } else if (free == "1") {
+                      placeTimeBackgroundColor = Colors.green;
+                    } else if (free == "0") {
+                      placeTimeBackgroundColor = Colors.red;
+                    }
+//                  }
+
                   return new GestureDetector(
                     onTap: () {
                       onTappedTime(
@@ -264,7 +306,7 @@ class _TimeSelectionScheduleState extends State<TimeSelectionSchedule> {
                           groundName +
                               "." +
                               reservationTimeList[i]["times"][index]["hour"],
-                          placeTimeForServer);
+                          groundId + '.' + reservationTimeList[i]["times"][index]["hour"]);
                     },
                     child: new Chip(
                       avatar: new CircleAvatar(

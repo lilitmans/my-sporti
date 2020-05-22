@@ -19,7 +19,7 @@ class _SplashScreenState extends State<SplashScreen> {
     new Future.delayed(
       const Duration(seconds: 3),
       () => Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => ClubSelectionScreen()),
+          MaterialPageRoute(builder: (context) => ClubSelectionScreen(value: "")),
           (Route<dynamic> route) => false),
     );
   }

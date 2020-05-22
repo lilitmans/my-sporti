@@ -4,6 +4,10 @@ import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/bloc.dart';
+import '../repositories/repositories.dart';
+
+import 'dart:convert';
+import 'package:intl/intl.dart';
 
 class ConfirmationScreen extends StatelessWidget {
 //  final Map<String, dynamic> confirmationResponseList;
@@ -13,19 +17,29 @@ class ConfirmationScreen extends StatelessWidget {
   final String reservationEmail;
   final String reservationPhone;
   final String reservationPin;
+  final String tappedTimeForServer;
+  final String dateFormat;
 //  final Map<String, dynamic> dataRequestExecuteReservation;
 
   ConfirmationScreen(
-      {this.club,
-      this.groundTypeId,
-      this.reservationName,
-      this.reservationEmail,
-      this.reservationPhone,
-      this.reservationPin});
+      {
+        this.club,
+        this.groundTypeId,
+        this.reservationName,
+        this.reservationEmail,
+        this.reservationPhone,
+        this.reservationPin,
+        this.tappedTimeForServer,
+        this.dateFormat});
 
   @override
   Widget build(BuildContext context) {
-    List dataRequestExecuteReservation;
+    List confirmationResponse;
+//    ConfirmationResponseListApiClient confResponseListApiClient = ConfirmationResponseListApiClient();
+//    var itms = confResponseListApiClient.leng;
+
+//    String _dateForServer = DateFormat('yyyy-MM-dd').format(dateFormat);
+    String _tappedTimeForServerStr;
 //        Provider.of<MakeRequestExecuteReservation>(context).returnResponse();
     return BlocBuilder<ConfirmationResponseListBloc,
         ConfirmationResponseListState>(builder: (context, state) {
@@ -33,23 +47,24 @@ class ConfirmationScreen extends StatelessWidget {
         BlocProvider.of<ConfirmationResponseListBloc>(context).add(
             MakeRequestExecuteReservation(
                 clubId: club["id"],
+                groundTypeId: groundTypeId,
                 reservationName: reservationName,
                 reservationEmail: reservationEmail,
                 reservationPhone: reservationPhone,
-                reservationPin: reservationPin
-//    "",
-//    date,
-//   tappedTimeForServer
+                reservationPin: reservationPin,
+                date: dateFormat,
+                tappedTimeForServer: tappedTimeForServer,
                 ));
-        print(
-            "ID: ${club["id"]}, GROUND_ID: $groundTypeId, NAME: $reservationName, EMAIL: $reservationEmail, PHONE: $reservationPhone, PIN: $reservationPin");
       }
+
       if (state is ConfirmationResponseListError) {
+
         return Center(
           child: Text('Failed to fetch Reservation Confirmation List'),
         );
       }
       if (state is ConfirmationResponseListLoaded) {
+        confirmationResponse = state.confirmationResponseList.confirmResult;
         return Scaffold(
           appBar: AppBar(
 //        title: appBar(context, club["name"]),
@@ -63,22 +78,22 @@ class ConfirmationScreen extends StatelessWidget {
               children: <Widget>[
                 Expanded(
                   child: ListView.builder(
-                    itemCount: dataRequestExecuteReservation == null
+                    itemCount: confirmationResponse == null
                         ? 0
-                        : dataRequestExecuteReservation.length,
+                        : confirmationResponse.length,
                     itemBuilder: (BuildContext context, i) {
                       return new ListTile(
                         leading: Icon(
-                            dataRequestExecuteReservation[i]["result"] == "ok"
+                            confirmationResponse[i]["result"] == "ok"
                                 ? Icons.event_available
                                 : Icons.event_busy,
-                            color: (dataRequestExecuteReservation[i]
+                            color: (confirmationResponse[i]
                                         ["result"] ==
                                     "ok"
                                 ? Colors.green
                                 : Colors.red)),
                         title: new Text(
-                            dataRequestExecuteReservation[i]["description"]),
+                            confirmationResponse[i]["description"]),
                       );
                     },
                   ),

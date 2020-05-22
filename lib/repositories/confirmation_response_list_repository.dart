@@ -17,8 +17,8 @@ class ConfirmationResponseListRepository {
     reservationEmail,
     reservationPhone,
     reservationPin,
-//      _date,
-//      _tappedTimeForServer,
+      tappedTimeForServer,
+      date,
   ) async {
     return await confirmationResponseListApiClient
         .makeRequestExecuteReservation(
@@ -28,8 +28,8 @@ class ConfirmationResponseListRepository {
       reservationEmail,
       reservationPhone,
       reservationPin,
-//      _date,
-//      _tappedTimeForServer,
+        tappedTimeForServer,
+      date,
     );
   }
 }

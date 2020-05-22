@@ -14,6 +14,9 @@ var _filter;
 bool _isInputValueMatch = false;
 
 class ClubSelectionScreen extends StatefulWidget {
+  final String value;
+
+  ClubSelectionScreen({this.value});
   @override
   _ClubSelectionScreenState createState() => _ClubSelectionScreenState();
 }
@@ -23,9 +26,13 @@ class _ClubSelectionScreenState extends State<ClubSelectionScreen> {
 
   @override
   void initState() {
-    super.initState();
     _myController.addListener(_isSearchValueMatch);
     getids();
+    super.initState();
+
+    setState(() {
+      _myController.text = widget.value;
+    });
   }
 
   void getids() async {
@@ -65,7 +72,10 @@ class _ClubSelectionScreenState extends State<ClubSelectionScreen> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
-                onChanged: (value) {},
+                onChanged: (value) {
+
+                },
+                autofocus: true,
                 controller: _myController,
                 decoration: InputDecoration(
                   labelText: "Suche",
@@ -163,6 +173,7 @@ class ClubsItemList extends StatelessWidget {
                                   club: clubs[i],
                                   groundName: clubs[i]
                                       ["ground_type__description"],
+                                  filter: _filter,
                                 ),
                               ),
                             );
@@ -174,6 +185,7 @@ class ClubsItemList extends StatelessWidget {
                                 builder: (context) => CourtTypeSelectionScreen(
                                   club: clubs[i],
                                   clubId: clubId,
+                                  filter: _filter,
                                 ),
                               ),
                             );

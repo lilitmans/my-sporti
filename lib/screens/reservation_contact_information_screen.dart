@@ -13,11 +13,12 @@ final formKeyReservationData = GlobalKey<FormState>();
 class ReservationContactInformationScreen extends StatefulWidget {
   final Map<String, dynamic> club;
   final String groundName;
-  final String tappedTime;
   final List reservationTimeList;
+  final DateTime date;
+  final String tappedTimeForServer;
 
   ReservationContactInformationScreen(
-      {this.club, this.groundName, this.tappedTime, this.reservationTimeList});
+      {this.club, this.groundName, this.reservationTimeList, this.date, this.tappedTimeForServer});
 
   @override
   _ReservationContactInformationScreenState createState() =>
@@ -30,21 +31,27 @@ class _ReservationContactInformationScreenState
   String reservationName;
   String reservationEmail;
   String reservationPhone;
-  DateTime date;
-  String _tappedTime;
-  String tappedTimeForServer;
+  String dateForServer;
+
+  @override
+  void initState() {
+    dateForServer = DateFormat('yyyy-MM-dd').format( this.widget.date);
+    super.initState();
+  }
+//  String _tappedTime;
+//  String tappedTimeForServer;
 
 //  String tappedTimeReadable() {
 //    return _tappedTime.split('|').where((s) => s.isNotEmpty).join("\r\n");
 //  }
-
-  @override
-  void initState() {
-    date = DateTime.now().toLocal();
-//    _tappedTime = "";
-    tappedTimeForServer = DateFormat('yyyy-MM-dd – kk:mm').format(date);
-    super.initState();
-  }
+//
+//  @override
+//  void initState() {
+//    date = DateTime.now().toLocal();
+////    _tappedTime = "";
+////    tappedTimeForServer = DateFormat('yyyy-MM-dd – kk:mm').format(date);
+//    super.initState();
+//  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +74,7 @@ class _ReservationContactInformationScreenState
                   style:
                       TextStyle(fontWeight: FontWeight.bold, fontSize: 30.0)),
               Text(" "),
-              Text(DateFormat('yyyy-MM-dd').format(date)),
+              Text(DateFormat('yyyy-MM-dd').format(this.widget.date)),
 //              this.widget.receivedDate
               Text(" "),
               Column(
@@ -129,14 +136,22 @@ class _ReservationContactInformationScreenState
                             onPressed: () {
                               if (formKeyReservationData.currentState
                                   .validate()) {
-//                                Navigator.push(
-//                                  context,
-//                                  MaterialPageRoute(
-//                                    builder: (context) => ConfirmationScreen(
-//                                        club: this.widget.club,
-//                                    ""),
-//                                  ),
-//                                );
+                                Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ConfirmationScreen(
+                                  club: this.widget.club,
+                                  groundTypeId:
+                                      this.widget.club["ground_type__id"],
+                                  reservationName: reservationName,
+                                  reservationEmail: reservationEmail,
+                                  reservationPhone: reservationPhone,
+                                  reservationPin: "",
+                                  tappedTimeForServer: this.widget.tappedTimeForServer,
+                                  dateFormat: dateForServer,
+                                ),
+                              ),
+                            );
                               }
                             },
                             child: Text('Reservieren'),

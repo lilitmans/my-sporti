@@ -26,14 +26,14 @@ class ConfirmationResponseListBloc
         final ConfirmationResponseList confirmationResponseList =
             await confirmationResponseListRepository
                 .makeRequestExecuteReservation(
-          event.clubId,
-          event.groundTypeId,
-          event.reservationName,
-          event.reservationEmail,
-          event.reservationPhone,
-          event.reservationPin,
-//          event._date,
-//          event._tappedTimeForServer,
+                event.clubId,
+                event.groundTypeId,
+                event.reservationName,
+                event.reservationEmail,
+                event.reservationPhone,
+                event.reservationPin,
+                event.tappedTimeForServer,
+                event.date,
         );
         yield ConfirmationResponseListLoaded(
             confirmationResponseList: confirmationResponseList);

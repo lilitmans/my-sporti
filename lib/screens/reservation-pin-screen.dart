@@ -10,9 +10,10 @@ final formKeyReservationData = GlobalKey<FormState>();
 class ReservationPinScreen extends StatefulWidget {
   final Map<String, dynamic> club;
   final List reservationTimeList;
-  final String tappedTime;
+  final DateTime date;
+  final String tappedTimeForServer;
 
-  ReservationPinScreen({this.club, this.tappedTime, this.reservationTimeList});
+  ReservationPinScreen({this.club, this.date, this.tappedTimeForServer, this.reservationTimeList});
 
   @override
   _ReservationPinScreenState createState() => _ReservationPinScreenState();
@@ -20,25 +21,18 @@ class ReservationPinScreen extends StatefulWidget {
 
 class _ReservationPinScreenState extends State<ReservationPinScreen> {
   String reservationPin;
-  DateTime date;
-//  String _tappedTime;
-  String tappedTimeForServer;
-//  MakeRequestExecuteReservation executeReservation =
-//      MakeRequestExecuteReservation();
+  String dateForServer;
 
   @override
   void initState() {
-    date = DateTime.now().toLocal();
-//    _tappedTime = "";
-    tappedTimeForServer = DateFormat('yyyy-MM-dd – kk:mm').format(date);
+    dateForServer = DateFormat('yyyy-MM-dd').format( this.widget.date);
     super.initState();
   }
-
+//  String formattedDate = DateFormat('yyyy-MM-dd – kk:mm').format(now);
   @override
   Widget build(BuildContext context) {
     List _tappedTimeList = tappedTimeList;
 //    tappedTimeList = [];
-
     bool _lockIcon = true;
     return Scaffold(
       resizeToAvoidBottomPadding: false,
@@ -118,6 +112,7 @@ class _ReservationPinScreenState extends State<ReservationPinScreen> {
                         ),
                       ),
                       SizedBox(height: 25),
+
                       RaisedButton(
                         color: Colors.orange,
                         onPressed: () {
@@ -134,6 +129,8 @@ class _ReservationPinScreenState extends State<ReservationPinScreen> {
                                   reservationEmail: "",
                                   reservationPhone: "",
                                   reservationPin: reservationPin,
+                                  tappedTimeForServer: this.widget.tappedTimeForServer,
+                                  dateFormat: dateForServer,
                                 ),
                               ),
                             );

@@ -11,8 +11,8 @@ class MakeRequestExecuteReservation extends ConfirmationResponseListEvent {
   final String reservationEmail;
   final String reservationPhone;
   final String reservationPin;
-//  final DateTime date;
-//  final DateTime tappedTimeForServer;
+  final String tappedTimeForServer;
+  final String date;
 
   const MakeRequestExecuteReservation({
     this.clubId,
@@ -21,9 +21,17 @@ class MakeRequestExecuteReservation extends ConfirmationResponseListEvent {
     this.reservationEmail,
     this.reservationPhone,
     this.reservationPin,
-//    this.date,
-//    this.tappedTimeForServer,
+    this.tappedTimeForServer,
+    this.date,
   });
+
+//  clubId: club["id"],+
+//  reservationName: reservationName,+
+//  reservationEmail: reservationEmail,+
+//  reservationPhone: reservationPhone,+
+//  reservationPin: reservationPin,+
+//  date: _dateForServer,+
+//  tappedTimeForServer: tappedTimeForServer,+
 
   @override
   List<Object> get props => [
@@ -33,7 +41,7 @@ class MakeRequestExecuteReservation extends ConfirmationResponseListEvent {
         reservationEmail,
         reservationPhone,
         reservationPin,
-//        date,
-//        tappedTimeForServer,
+    tappedTimeForServer,
+        date,
       ];
 }

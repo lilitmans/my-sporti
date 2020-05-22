@@ -7,36 +7,52 @@ import '../bloc/bloc.dart';
 import 'time_selection_screen.dart';
 import '../repositories/repositories.dart';
 
-class CourtTypeSelectionScreen extends StatelessWidget {
+class CourtTypeSelectionScreen extends StatefulWidget {
   final Map<String, dynamic> club;
   final String clubId;
-  CourtTypeSelectionScreen({this.club, this.clubId});
+  final String filter;
+
+  CourtTypeSelectionScreen({this.club, this.clubId, this.filter});
+
+  @override
+  _CourtTypeSelectionScreenState createState() => _CourtTypeSelectionScreenState();
+}
+
+class _CourtTypeSelectionScreenState extends State<CourtTypeSelectionScreen> {
+  MarkClubAsFavorite markClubAsFavorite = MarkClubAsFavorite();
+  bool _clubIsFav = false;
+
+  @override
+
+  void initState() {
+    print("_clubIsFav ${markClubAsFavorite.clubIsFav}");
+    markClubAsFavorite.markClubAsFavorite(this.widget.club["id"]);
+    _clubIsFav = markClubAsFavorite.clubIsFav;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    MarkClubAsFavorite markClubAsFavorite = MarkClubAsFavorite();
-    markClubAsFavorite.markClubAsFavorite(club["id"]);
-    bool _clubIsFav = markClubAsFavorite.clubIsFav;
-//    print(_clubIsFav);
 
     return Scaffold(
-      appBar: AppBar(title: appBar(context, club["name"]), actions: <Widget>[
+      appBar: AppBar(title: appBar(context, this.widget.club["name"]), actions: <Widget>[
         (_clubIsFav ? new Icon(Icons.favorite) : new Container())
-      ]),
+      ],),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            GroundTypesList(club: club, clubId: clubId),
-            thereIsClubImage(club),
+            GroundTypesList(club: this.widget.club, clubId: this.widget.club["id"]),
+            thereIsClubImage(this.widget.club),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         heroTag: 'btn2',
         onPressed: () {
-          Navigator.pop(context);
-//          backToClubSelectionPage,
+          Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => ClubSelectionScreen(value: this.widget.filter,)),
+                  (Route<dynamic> route) => true);
         },
         child: new Icon(Icons.arrow_back_ios),
       ),
@@ -87,11 +103,9 @@ class GroundTypesList extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) => TimeSelectionScreen(
-                              club: club,
-                              groundName: state
-                                  .groundTypesList.groundTypesList[i]["name"],
-//                              clubId: clubId,
-//                              groundTypeId: groundTypeId,
+                                club: club,
+                                groundName: state
+                                    .groundTypesList.groundTypesList[i]["name"]
                             ),
                           ),
                         );

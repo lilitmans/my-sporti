@@ -7,7 +7,7 @@ class MarkClubAsFavorite extends ChangeNotifier {
   String _favoriteClub = "";
   String clubFavoriteKey = 'clubFavorite';
   String clubFavorite = "";
-  bool clubIsFav;
+  bool clubIsFav = false;
 
   void readFavorite() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

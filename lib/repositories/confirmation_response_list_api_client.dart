@@ -23,7 +23,6 @@ class ConfirmationResponseListApiClient {
     @required this.httpClient,
   }) : assert(httpClient != null);
 
-  ConfirmationResponseList confirmationResponseList;
   Future<ConfirmationResponseList> makeRequestExecuteReservation(
     _clubId,
     _groundTypeId,
@@ -31,29 +30,25 @@ class ConfirmationResponseListApiClient {
     _reservationEmail,
     _reservationPhone,
     _reservationPin,
-//      _date,
-//      _tappedTimeForServer,
+      _tappedTimeForServer,
+      _date,
   ) async {
+
+    ConfirmationResponseList confirmationResponseList;
+
     String urlParams = "";
     urlParams += "&id_club=" + _clubId;
     urlParams += "&id_ground_type=" + _groundTypeId;
-    urlParams +=
-        "&reservationName=" + base64.encode(utf8.encode(_reservationName));
-    urlParams +=
-        "&reservationEmail=" + base64.encode(utf8.encode(_reservationEmail));
-    urlParams +=
-        "&reservationPhone=" + base64.encode(utf8.encode(_reservationPhone));
-    urlParams +=
-        "&reservationPin=" + base64.encode(utf8.encode(_reservationPin));
-//    urlParams += "&date=" +
-//        base64.encode(utf8.encode(DateFormat('yyyy-MM-dd').format(_date)));
-//    urlParams +=
-//        "&tappedTime=" + base64.encode(utf8.encode(_tappedTimeForServer));
+    urlParams += "&reservationName=" + base64.encode(utf8.encode(_reservationName));
+    urlParams += "&reservationEmail=" + base64.encode(utf8.encode(_reservationEmail));
+    urlParams += "&reservationPhone=" + base64.encode(utf8.encode(_reservationPhone));
+    urlParams += "&reservationPin=" + base64.encode(utf8.encode(_reservationPin));
+    urlParams += "&date=" + base64.encode(utf8.encode(_date));
+    urlParams += "&tappedTime=" + base64.encode(utf8.encode(_tappedTimeForServer));
 
-//    final url = '$_baseUrl/?app_request=true&get_clubs=true';
-    final response = await this.httpClient.get(
-        Uri.encodeFull(_baseUrl + 'execute_reservation=true' + urlParams),
-        headers: {"Accept": "application/json"});
+    var response = await http.get(Uri.encodeFull(_baseUrl +'/?app_request=true&execute_reservation=true'+urlParams), headers: {"Accept": "application/json"});
+//    var url = Uri.encodeFull(_baseUrl +'?app_request=true&execute_reservation=true'+urlParams);
+//    print("response: $url");
 
     if (response.statusCode != 200) {
       throw new Exception(
@@ -62,8 +57,7 @@ class ConfirmationResponseListApiClient {
 
     final json = jsonDecode(response.body);
     confirmationResponseList = ConfirmationResponseList.fromJson(json);
-    print("ConfirmationResponseList: $confirmationResponseList");
-
+//    print("ConfirmationResponseList: $confirmationResponseList");
     return confirmationResponseList;
   }
 
