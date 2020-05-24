@@ -60,6 +60,7 @@ class _ReservationContactInformationScreenState
     return Scaffold(
 //        resizeToAvoidBottomPadding: false,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: appBar(context, this.widget.club["name"]),
       ),
 //        actions: <Widget>[

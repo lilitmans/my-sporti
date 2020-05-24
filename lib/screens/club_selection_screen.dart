@@ -26,8 +26,9 @@ class _ClubSelectionScreenState extends State<ClubSelectionScreen> {
 
   @override
   void initState() {
+//    print("$re");
     _myController.addListener(_isSearchValueMatch);
-    getids();
+    getIds();
     super.initState();
 
     setState(() {
@@ -35,11 +36,11 @@ class _ClubSelectionScreenState extends State<ClubSelectionScreen> {
     });
   }
 
-  void getids() async {
+  void getIds() async {
     String _clubFavKey;
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var xx = prefs.getString(_clubFavKey);
-    print("favorite $xx");
+    String thisId = prefs.getString(_clubFavKey);
+    print("favorite $thisId");
   }
 
   _isSearchValueMatch() {
@@ -72,9 +73,6 @@ class _ClubSelectionScreenState extends State<ClubSelectionScreen> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
-                onChanged: (value) {
-
-                },
                 autofocus: true,
                 controller: _myController,
                 decoration: InputDecoration(
@@ -119,12 +117,12 @@ class ClubsItemList extends StatelessWidget {
           BlocProvider.of<ClubsListBloc>(context).add(FetchClubsList());
         }
         if (state is ClubsListError) {
-          favoriteClub.readFavorite();
           return Center(
             child: Text('Failed to fetch clubs list'),
           );
         }
         if (state is ClubsListLoaded) {
+          favoriteClub.readFavorite();
           return Expanded(
             child: ListView.builder(
               itemCount: state.clubsList.clubs == null
@@ -156,7 +154,6 @@ class ClubsItemList extends StatelessWidget {
                           onPressed: () {
                             favoriteClub.markClubAsFavorite(clubId);
                             favoriteClub.readFavorite();
-//                            _incrementCounter(clubId);
                           },
                         ),
                         trailing: Icon(clubs[i]["allow_booking"] == "1"
@@ -164,8 +161,6 @@ class ClubsItemList extends StatelessWidget {
                             : Icons.person),
                         onTap: () {
                           if (clubs[i]["cnt_ground_type"] == "1") {
-//                            print(
-//                                "${clubs[i]}, $clubId, ${clubs[i]['ground_type__id']}");
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -173,12 +168,12 @@ class ClubsItemList extends StatelessWidget {
                                   club: clubs[i],
                                   groundName: clubs[i]
                                       ["ground_type__description"],
+                                  groundTypeId: clubs[i]['id'],
                                   filter: _filter,
                                 ),
                               ),
                             );
                           } else {
-//                          print(clubId);
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -190,8 +185,6 @@ class ClubsItemList extends StatelessWidget {
                               ),
                             );
                           }
-//                        var loopedItem = clubs[i];
-//                onTappedClub(loopedItem);
                         },
                       ),
                     ),

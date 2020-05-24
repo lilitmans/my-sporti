@@ -13,4 +13,7 @@ void savePinCookie(_clubId, _reservationPin) async {
 //  print("ID: $_clubId, PIN: $_reservationPin");
   SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.setString(pinCookieKey + _clubId, _reservationPin);
+  print(prefs);
 }
+
+

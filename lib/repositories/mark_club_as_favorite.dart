@@ -51,6 +51,4 @@ class MarkClubAsFavorite extends ChangeNotifier {
     notifyListeners();
   }
 
-//
-
 }

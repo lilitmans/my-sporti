@@ -35,7 +35,9 @@ class _CourtTypeSelectionScreenState extends State<CourtTypeSelectionScreen> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: AppBar(title: appBar(context, this.widget.club["name"]), actions: <Widget>[
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: appBar(context, this.widget.club["name"]), actions: <Widget>[
         (_clubIsFav ? new Icon(Icons.favorite) : new Container())
       ],),
       body: Center(
@@ -89,9 +91,7 @@ class GroundTypesList extends StatelessWidget {
                   ? 0
                   : state.groundTypesList.groundTypesList.length,
               itemBuilder: (BuildContext context, i) {
-//                print(state.groundTypesList);
                 groundTypes = state.groundTypesList.groundTypesList;
-                groundTypeId = groundTypes[i]["id"];
                 return SingleChildScrollView(
                   child: Hero(
                     tag: 'groundTag$i',
@@ -104,6 +104,7 @@ class GroundTypesList extends StatelessWidget {
                           MaterialPageRoute(
                             builder: (context) => TimeSelectionScreen(
                                 club: club,
+                                groundTypeId: groundTypes[i]["id"],
                                 groundName: state
                                     .groundTypesList.groundTypesList[i]["name"]
                             ),

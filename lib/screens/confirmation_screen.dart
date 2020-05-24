@@ -6,11 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/bloc.dart';
 import '../repositories/repositories.dart';
 
-import 'dart:convert';
-import 'package:intl/intl.dart';
-
 class ConfirmationScreen extends StatelessWidget {
-//  final Map<String, dynamic> confirmationResponseList;
   final Map<String, dynamic> club;
   final String groundTypeId;
   final String reservationName;
@@ -19,7 +15,6 @@ class ConfirmationScreen extends StatelessWidget {
   final String reservationPin;
   final String tappedTimeForServer;
   final String dateFormat;
-//  final Map<String, dynamic> dataRequestExecuteReservation;
 
   ConfirmationScreen(
       {
@@ -35,12 +30,7 @@ class ConfirmationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List confirmationResponse;
-//    ConfirmationResponseListApiClient confResponseListApiClient = ConfirmationResponseListApiClient();
-//    var itms = confResponseListApiClient.leng;
 
-//    String _dateForServer = DateFormat('yyyy-MM-dd').format(dateFormat);
-    String _tappedTimeForServerStr;
-//        Provider.of<MakeRequestExecuteReservation>(context).returnResponse();
     return BlocBuilder<ConfirmationResponseListBloc,
         ConfirmationResponseListState>(builder: (context, state) {
       if (state is ConfirmationResponseListEmpty) {
@@ -67,7 +57,8 @@ class ConfirmationScreen extends StatelessWidget {
         confirmationResponse = state.confirmationResponseList.confirmResult;
         return Scaffold(
           appBar: AppBar(
-//        title: appBar(context, club["name"]),
+            automaticallyImplyLeading: false,
+            title: appBar(context, club["name"]),
               ),
 //        actions: <Widget>[
 //        (clubIsFavorite ? new Icon(Icons.favorite) : new Container())
@@ -98,7 +89,7 @@ class ConfirmationScreen extends StatelessWidget {
                     },
                   ),
                 ),
-//            thereIsClubImage(club),
+            thereIsClubImage(club),
               ],
             ),
           ),
