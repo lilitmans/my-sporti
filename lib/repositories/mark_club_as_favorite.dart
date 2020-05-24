@@ -24,21 +24,24 @@ class MarkClubAsFavorite extends ChangeNotifier {
   }
 
   void markClubAsFavorite(String clubId) async {
-//    bool clubIsFav = false;
     String _clubFavKey;
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _favoriteClub = prefs.getString(_clubFavKey);
 
+    print("_clubFavKey: $_clubFavKey");
     if (_favoriteClub == null) {
       _favoriteClub = "";
+      print("2 _clubFavKey1: $_clubFavKey, club: $clubId");
     }
 
     if (_favoriteClub.contains(";" + clubId + ";")) {
       _favoriteClub = _favoriteClub.replaceAll(";" + clubId + ";", ";");
+      print("3 _clubFavKey1: $_clubFavKey, club: $clubId");
       print("3 $_favoriteClub");
     } else {
       _favoriteClub = _favoriteClub + ";" + clubId + ";";
+      print("4 _clubFavKey1: $_clubFavKey, club: $clubId");
       print("4 $_favoriteClub");
     }
     _favoriteClub = _favoriteClub.replaceAll(";;", ";"); // cleanup
@@ -46,9 +49,8 @@ class MarkClubAsFavorite extends ChangeNotifier {
     prefs.setString(_clubFavKey, _favoriteClub);
 
     clubIsFav = _favoriteClub.contains(";" + clubId + ";");
-    print("5 $_favoriteClub $clubIsFav");
-//    favoriteClubs.add(value);
+    print("favoriteClub: $_favoriteClub");
+    favoriteClubs.add(_favoriteClub);
     notifyListeners();
   }
-
 }

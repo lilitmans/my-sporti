@@ -16,8 +16,7 @@ class ConfirmationScreen extends StatelessWidget {
   final String tappedTimeForServer;
   final String dateFormat;
 
-  ConfirmationScreen(
-      {
+  ConfirmationScreen({
         this.club,
         this.groundTypeId,
         this.reservationName,

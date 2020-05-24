@@ -22,55 +22,37 @@ class ReservationPinScreen extends StatefulWidget {
 }
 
 class _ReservationPinScreenState extends State<ReservationPinScreen> {
-  String reservationPin;
+  String pinCookieKey = "clubId";
+  String reservationPin = "";
   String dateForServer;
-//  String storagePin;
-  TextEditingController _controller = new TextEditingController();
+  TextEditingController _pinController = new TextEditingController();
 
   @override
   void initState() {
     dateForServer = DateFormat('yyyy-MM-dd').format(this.widget.date);
-    if (reservationPin == null) {
-      reservationPin = "";
-//      _controller.text = reservationPin;
-    }
-    getStoragePin();
+    _readPinCookie();
     super.initState();
   }
 
-  void getStoragePin() async{
-    String _reservationPinKey ="pin";
+  void _readPinCookie() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String getPinFromStorage = prefs.getString(_reservationPinKey);
-     setState(() {
-       if(getPinFromStorage == null) {
-         getPinFromStorage = "";
-       }
-       reservationPin = getPinFromStorage;
-       _controller.text = reservationPin;
-     });
-    print("reservationPin Get Pin: $reservationPin");
+    reservationPin = prefs.getString(pinCookieKey+widget.club["id"]);
+    if(reservationPin==null) reservationPin = "";
+    setState(() {
+      _pinController = new TextEditingController(text: reservationPin);
+    });
   }
 
-  void setPin(String pin)  async {
+  void _savePinCookie() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String _reservationPinKey ="pin";
-    prefs.setString(_reservationPinKey, pin);
-    var getPinFromStorage = prefs.getString(_reservationPinKey);
-    print("getPinFromStorage $getPinFromStorage");
-    if(getPinFromStorage == null) {
-      getPinFromStorage = "";
-    }
-    reservationPin =  getPinFromStorage;
-    _controller.text = reservationPin;
-    print("reservationPin Set Pin: $reservationPin");
+    setState(() {
+      prefs.setString(pinCookieKey+widget.club['id'], reservationPin);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     List _tappedTimeList = tappedTimeList;
-
-//    tappedTimeList = [];
     bool _lockIcon = true;
 
     return Scaffold(
@@ -117,33 +99,18 @@ class _ReservationPinScreenState extends State<ReservationPinScreen> {
                             labelText: 'PIN',
                             icon: FlatButton(
                               padding: EdgeInsets.all(0.0),
-                              onPressed: () {
-                                setState(() {
-                                  _lockIcon = !_lockIcon;
-                                });
-                              },
                               child: Icon(
                                   _lockIcon ? Icons.lock : Icons.lock_open),
                             ),
                           ),
-                          controller: TextEditingController(text: reservationPin),
-//                          initialValue: reservationPin,
-                          obscureText: false,
+                          controller: _pinController,
+                          obscureText: true,
                           validator: (value) {
-//                            setState(() {
-//                              AddPin(value);
-//                              savePinCookie(this.widget.club["id"], value);
-//                            });
+                            reservationPin = value;
                             if (value.isEmpty) {
                               return 'Bitte den PIN eintragen.';
                             }
                             return null;
-                          },
-                          onSaved: (value) {
-                            setState(() {
-                              reservationPin = value;
-                              setPin(value);
-                            });
                           },
                         ),
                       ),
@@ -154,6 +121,7 @@ class _ReservationPinScreenState extends State<ReservationPinScreen> {
                         onPressed: () {
                           // Validate returns true if the form is valid, otherwise false.
                           if (_formKeyReservationData.currentState.validate()) {
+                            _savePinCookie();
                             Navigator.push(
                               context,
                               MaterialPageRoute(

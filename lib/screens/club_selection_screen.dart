@@ -65,7 +65,9 @@ class _ClubSelectionScreenState extends State<ClubSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: appBar(context, 'Clubauswahl')),
+      appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: appBar(context, 'Clubauswahl')),
       body: Container(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -114,6 +116,7 @@ class ClubsItemList extends StatelessWidget {
       builder: (context, state) {
         if (state is ClubsListEmpty) {
           favoriteClub.readFavorite();
+          print("favoriteClubs: ${favoriteClub.favoriteClubs}");
           BlocProvider.of<ClubsListBloc>(context).add(FetchClubsList());
         }
         if (state is ClubsListError) {
