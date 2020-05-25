@@ -5,8 +5,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/bloc.dart';
 import '../repositories/repositories.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class ConfirmationScreen extends StatelessWidget {
+
+class ConfirmationScreen extends StatefulWidget {
   final Map<String, dynamic> club;
   final String groundTypeId;
   final String reservationName;
@@ -17,14 +19,42 @@ class ConfirmationScreen extends StatelessWidget {
   final String dateFormat;
 
   ConfirmationScreen({
-        this.club,
-        this.groundTypeId,
-        this.reservationName,
-        this.reservationEmail,
-        this.reservationPhone,
-        this.reservationPin,
-        this.tappedTimeForServer,
-        this.dateFormat});
+    this.club,
+    this.groundTypeId,
+    this.reservationName,
+    this.reservationEmail,
+    this.reservationPhone,
+    this.reservationPin,
+    this.tappedTimeForServer,
+    this.dateFormat});
+
+  @override
+  _ConfirmationScreenState createState() => _ConfirmationScreenState();
+}
+
+class _ConfirmationScreenState extends State<ConfirmationScreen> {
+
+  void initState() {
+    _readFavorite();
+    super.initState();
+  }
+
+  bool _clubIsFav = false;
+  String clubFavoriteKey = 'clubFavorite';
+  String clubFavorite = "";
+  void _readFavorite() async
+  {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    clubFavorite = prefs.getString(clubFavoriteKey);
+    if(clubFavorite==null) clubFavorite = "";
+    isClubFavorite();
+  }
+
+  isClubFavorite() {
+    setState(() {
+      _clubIsFav = clubFavorite.contains(";"+ this.widget.club["id"]+";");
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,15 +65,16 @@ class ConfirmationScreen extends StatelessWidget {
       if (state is ConfirmationResponseListEmpty) {
         BlocProvider.of<ConfirmationResponseListBloc>(context).add(
             MakeRequestExecuteReservation(
-                clubId: club["id"],
-                groundTypeId: groundTypeId,
-                reservationName: reservationName,
-                reservationEmail: reservationEmail,
-                reservationPhone: reservationPhone,
-                reservationPin: reservationPin,
-                date: dateFormat,
-                tappedTimeForServer: tappedTimeForServer,
-                ));
+              clubId: this.widget.club["id"],
+              groundTypeId: this.widget.groundTypeId,
+              reservationName: this.widget.reservationName,
+              reservationEmail: this.widget.reservationEmail,
+              reservationPhone: this.widget.reservationPhone,
+              reservationPin: this.widget.reservationPin,
+              date: this.widget.dateFormat,
+              tappedTimeForServer: this.widget.tappedTimeForServer,
+            ),
+        );
       }
 
       if (state is ConfirmationResponseListError) {
@@ -57,11 +88,11 @@ class ConfirmationScreen extends StatelessWidget {
         return Scaffold(
           appBar: AppBar(
             automaticallyImplyLeading: false,
-            title: appBar(context, club["name"]),
-              ),
-//        actions: <Widget>[
-//        (clubIsFavorite ? new Icon(Icons.favorite) : new Container())
-//      ],);
+            title: appBar(context, this.widget.club["name"]),
+            actions: <Widget>[
+              (_clubIsFav ? new Icon(Icons.favorite) : new Container())
+            ],),
+
           body: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -78,8 +109,8 @@ class ConfirmationScreen extends StatelessWidget {
                                 ? Icons.event_available
                                 : Icons.event_busy,
                             color: (confirmationResponse[i]
-                                        ["result"] ==
-                                    "ok"
+                            ["result"] ==
+                                "ok"
                                 ? Colors.green
                                 : Colors.red)),
                         title: new Text(
@@ -88,7 +119,7 @@ class ConfirmationScreen extends StatelessWidget {
                     },
                   ),
                 ),
-            thereIsClubImage(club),
+                thereIsClubImage(this.widget.club),
               ],
             ),
           ),

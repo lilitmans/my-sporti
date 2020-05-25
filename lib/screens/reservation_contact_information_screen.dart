@@ -38,6 +38,7 @@ class _ReservationContactInformationScreenState
   void initState() {
     dateForServer = DateFormat('yyyy-MM-dd').format( this.widget.date);
     _readCookie();
+    _readFavorite();
     super.initState();
   }
 
@@ -67,6 +68,23 @@ class _ReservationContactInformationScreenState
     });
   }
 
+  bool _clubIsFav = false;
+  String clubFavoriteKey = 'clubFavorite';
+  String clubFavorite = "";
+  void _readFavorite() async
+  {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    clubFavorite = prefs.getString(clubFavoriteKey);
+    if(clubFavorite==null) clubFavorite = "";
+    isClubFavorite();
+  }
+
+  isClubFavorite() {
+    setState(() {
+      _clubIsFav = clubFavorite.contains(";"+this.widget.club["id"]+";");
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     List _tappedTimeList = tappedTimeList;
@@ -75,10 +93,9 @@ class _ReservationContactInformationScreenState
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: appBar(context, this.widget.club["name"]),
-      ),
-//        actions: <Widget>[
-//        (clubIsFavorite ? new Icon(Icons.favorite) : new Container())
-//      ],
+        actions: <Widget>[
+          (_clubIsFav ? new Icon(Icons.favorite) : new Container())
+        ],),
       body: Center(
         child: SingleChildScrollView(
           child: Column(
@@ -159,7 +176,7 @@ class _ReservationContactInformationScreenState
                               context,
                               MaterialPageRoute(
                                 builder: (context) => ConfirmationScreen(
-                                  club: this.widget.club,
+                                  club: widget.club,
                                   groundTypeId:
                                       this.widget.club["ground_type__id"],
                                   reservationName: reservationName,

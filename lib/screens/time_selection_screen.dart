@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/bloc.dart';
 import '../screens/reservation_contact_information_screen.dart';
 import '../screens/reservation-pin-screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TimeSelectionScreen extends StatefulWidget {
   final Map<String, dynamic> club;
@@ -18,7 +19,6 @@ class TimeSelectionScreen extends StatefulWidget {
   TimeSelectionScreen({this.club, this.groundName, this.groundTypeId, this.filter});
 
   @override
-
   _TimeSelectionScreenState createState() => _TimeSelectionScreenState();
 }
 
@@ -36,8 +36,8 @@ class _TimeSelectionScreenState extends State<TimeSelectionScreen> {
     tappedTime = "";
     tappedTimeForServer = "";
     clubId = this.widget.club['id'];
+    _readFavorite();
     super.initState();
-
   }
 
   void refresh(String tappedTimeChild, String tappedTimeForServerChild) {
@@ -46,7 +46,24 @@ class _TimeSelectionScreenState extends State<TimeSelectionScreen> {
       tappedTimeForServer = tappedTimeForServerChild;
     });
   }
+
   bool status = true;
+  bool _clubIsFav = false;
+  String clubFavoriteKey = 'clubFavorite';
+  String clubFavorite = "";
+
+  void _readFavorite() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    clubFavorite = prefs.getString(clubFavoriteKey);
+    if(clubFavorite==null) clubFavorite = "";
+    isClubFavorite();
+  }
+
+  isClubFavorite() {
+    setState(() {
+      _clubIsFav = clubFavorite.contains(";"+this.widget.club["id"]+";");
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,10 +81,9 @@ class _TimeSelectionScreenState extends State<TimeSelectionScreen> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: appBar(context, this.widget.club["name"]),
-      ),
-//        actions: <Widget>[
-//        (clubIsFavorite ? new Icon(Icons.favorite) : new Container())
-//      ],
+        actions: <Widget>[
+        (_clubIsFav ? new Icon(Icons.favorite) : new Container())
+      ],),
       body: BlocBuilder<ReservationTimeListBloc, ReservationTimeListState>(
         builder: (context, state) {
           if (state is ReservationTimeListEmpty) {
@@ -114,7 +130,6 @@ class _TimeSelectionScreenState extends State<TimeSelectionScreen> {
                     child: Column(children: <Widget>[
                       Text("Datum und Uhrzeit auswählen"),
                       Text(DateFormat('yyyy-MM-dd – kk:mm').format(date))
-//                      Text(tappedTime == "" ? DateFormat('yyyy-MM-dd – kk:mm').format(date) : tappedTime)
                     ]),
                   ),
                   TimeSelectionSchedule(

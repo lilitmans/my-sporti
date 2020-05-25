@@ -30,7 +30,25 @@ class _ReservationPinScreenState extends State<ReservationPinScreen> {
   void initState() {
     dateForServer = DateFormat('yyyy-MM-dd').format(this.widget.date);
     _readPinCookie();
+    _readFavorite();
     super.initState();
+  }
+
+  bool _clubIsFav = false;
+  String clubFavoriteKey = 'clubFavorite';
+  String clubFavorite = "";
+
+  void _readFavorite() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    clubFavorite = prefs.getString(clubFavoriteKey);
+    if(clubFavorite==null) clubFavorite = "";
+    isClubFavorite();
+  }
+
+  isClubFavorite() {
+    setState(() {
+      _clubIsFav = clubFavorite.contains(";"+this.widget.club["id"]+";");
+    });
   }
 
   void _readPinCookie() async {
@@ -59,10 +77,11 @@ class _ReservationPinScreenState extends State<ReservationPinScreen> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: appBar(context, this.widget.club["name"]),
+        actions: <Widget>[
+          (_clubIsFav ? new Icon(Icons.favorite) : new Container())
+        ],
       ),
-//        actions: <Widget>[
-//        (clubIsFavorite ? new Icon(Icons.favorite) : new Container())
-//      ],
+
       body: Center(
         child: SingleChildScrollView(
           child: Column(
@@ -74,7 +93,6 @@ class _ReservationPinScreenState extends State<ReservationPinScreen> {
               Wrap(
                 direction: Axis.vertical,
                 alignment: WrapAlignment.center,
-
                 children: _tappedTimeList
                     .map((i) => Center(
                       child: Text(i.replaceAll("|","\n"),

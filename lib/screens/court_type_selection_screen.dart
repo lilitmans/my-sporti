@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/bloc.dart';
 import 'time_selection_screen.dart';
 import '../repositories/repositories.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CourtTypeSelectionScreen extends StatefulWidget {
   final Map<String, dynamic> club;
@@ -21,14 +22,26 @@ class CourtTypeSelectionScreen extends StatefulWidget {
 class _CourtTypeSelectionScreenState extends State<CourtTypeSelectionScreen> {
 //  MarkClubAsFavorite markClubAsFavorite = MarkClubAsFavorite();
   bool _clubIsFav = false;
+  String clubFavoriteKey = 'clubFavorite';
+  String clubFavorite = "";
 
   @override
-
   void initState() {
-//    print("_clubIsFav ${markClubAsFavorite.clubIsFav}");
-//    markClubAsFavorite.markClubAsFavorite(this.widget.club["id"]);
-//    _clubIsFav = markClubAsFavorite.clubIsFav;
+    _readFavorite();
     super.initState();
+  }
+
+  void _readFavorite() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    clubFavorite = prefs.getString(clubFavoriteKey);
+    if(clubFavorite==null) clubFavorite = "";
+    isClubFavorite();
+  }
+
+  isClubFavorite() {
+    setState(() {
+      _clubIsFav = clubFavorite.contains(";"+this.widget.club["id"]+";");
+    });
   }
 
   @override
@@ -111,7 +124,6 @@ class GroundTypesList extends StatelessWidget {
                           ),
                         );
                       },
-//                        onTappedGroundType(dataRequestGetGroundTypes[i]
                     ),
                   ),
                 );

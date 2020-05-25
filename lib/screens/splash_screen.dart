@@ -3,7 +3,6 @@ import 'club_selection_screen.dart';
 import '../common/theme.dart';
 import '../common/app_bar.dart';
 import 'dart:async';
-import '../repositories/repositories.dart';
 
 class SplashScreen extends StatefulWidget {
   @override

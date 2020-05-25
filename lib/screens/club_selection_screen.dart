@@ -93,7 +93,6 @@ class _ClubSelectionScreenState extends State<ClubSelectionScreen> {
     );
   }
 }
-
 class ClubsItemList extends StatefulWidget {
   @override
   _ClubsItemListState createState() => _ClubsItemListState();
@@ -104,7 +103,6 @@ class _ClubsItemListState extends State<ClubsItemList> {
 
   @override
   void initState() {
-//    getIds();
     _readFavorite();
     super.initState();
   }
@@ -119,8 +117,6 @@ class _ClubsItemListState extends State<ClubsItemList> {
     clubFavorite = prefs.getString(clubFavoriteKey);
     if(clubFavorite==null) clubFavorite = "";
   }
-
-
 
   void _markAsFavorite(clubId) async
   {
@@ -152,12 +148,10 @@ class _ClubsItemListState extends State<ClubsItemList> {
 
   @override
   Widget build(BuildContext context) {
-//    final favoriteClub = Provider.of<MarkClubAsFavorite>(context);
     return BlocBuilder<ClubsListBloc, ClubsListState>(
       builder: (context, state) {
         if (state is ClubsListEmpty) {
           _readFavorite();
-//          print("favoriteClubs: $favoriteClubs");
           BlocProvider.of<ClubsListBloc>(context).add(FetchClubsList());
         }
         if (state is ClubsListError) {
@@ -166,7 +160,6 @@ class _ClubsItemListState extends State<ClubsItemList> {
           );
         }
         if (state is ClubsListLoaded) {
-//          readFavorite();
           return Expanded(
             child: ListView.builder(
               itemCount: state.clubsList.clubs == null
@@ -178,7 +171,6 @@ class _ClubsItemListState extends State<ClubsItemList> {
                 String clubName = clubs[i]["name"].toLowerCase();
                 String clubAddress = clubs[i]["address"].toLowerCase();
 
-//                readFavorite();
                 if (_isInputValueMatch == false &&
                     !isClubFavorite(clubId)) {
                   return new Container();
