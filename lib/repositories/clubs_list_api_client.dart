@@ -23,7 +23,6 @@ class ClubsListApiClient {
       throw new Exception('Error getting Clubs List');
     }
     final json = jsonDecode(response.body);
-//    print(json);
     clubs = ClubsList.fromJson(json);
     return clubs;
   }

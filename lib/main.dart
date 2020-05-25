@@ -12,7 +12,7 @@ import 'bloc/bloc.dart';
 import 'repositories/clubs_list_api_client.dart';
 import 'repositories/repositories.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 
 class SimpleBlocDelegate extends BlocDelegate {
   @override
@@ -100,7 +100,7 @@ class Application extends StatelessWidget {
         BlocProvider(
             create: (context) => ReservationTimeListBloc(
                 reservationTimeListRepository: reservationTimeListRepository)),
-        ChangeNotifierProvider(create: (context) => MarkClubAsFavorite()),
+//        ChangeNotifierProvider(create: (context) => MarkClubAsFavorite()),
         BlocProvider(
             create: (context) => ConfirmationResponseListBloc(
                 confirmationResponseListRepository:

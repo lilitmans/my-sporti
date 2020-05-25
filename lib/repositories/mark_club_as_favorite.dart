@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-//import '../models/models.dart';
 
 class MarkClubAsFavorite extends ChangeNotifier {
   List<dynamic> favoriteClubs = [];

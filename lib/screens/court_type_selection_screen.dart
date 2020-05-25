@@ -19,15 +19,15 @@ class CourtTypeSelectionScreen extends StatefulWidget {
 }
 
 class _CourtTypeSelectionScreenState extends State<CourtTypeSelectionScreen> {
-  MarkClubAsFavorite markClubAsFavorite = MarkClubAsFavorite();
+//  MarkClubAsFavorite markClubAsFavorite = MarkClubAsFavorite();
   bool _clubIsFav = false;
 
   @override
 
   void initState() {
-    print("_clubIsFav ${markClubAsFavorite.clubIsFav}");
-    markClubAsFavorite.markClubAsFavorite(this.widget.club["id"]);
-    _clubIsFav = markClubAsFavorite.clubIsFav;
+//    print("_clubIsFav ${markClubAsFavorite.clubIsFav}");
+//    markClubAsFavorite.markClubAsFavorite(this.widget.club["id"]);
+//    _clubIsFav = markClubAsFavorite.clubIsFav;
     super.initState();
   }
 

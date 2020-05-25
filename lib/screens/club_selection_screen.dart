@@ -6,16 +6,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/bloc.dart';
 import 'court_type_selection_screen.dart';
 import 'time_selection_screen.dart';
-import 'package:provider/provider.dart';
-import '../repositories/repositories.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 
 var _filter;
 bool _isInputValueMatch = false;
 
 class ClubSelectionScreen extends StatefulWidget {
   final String value;
-
   ClubSelectionScreen({this.value});
   @override
   _ClubSelectionScreenState createState() => _ClubSelectionScreenState();
@@ -23,24 +21,14 @@ class ClubSelectionScreen extends StatefulWidget {
 
 class _ClubSelectionScreenState extends State<ClubSelectionScreen> {
   final _myController = TextEditingController();
-
   @override
   void initState() {
-//    print("$re");
     _myController.addListener(_isSearchValueMatch);
-    getIds();
     super.initState();
 
     setState(() {
       _myController.text = widget.value;
     });
-  }
-
-  void getIds() async {
-    String _clubFavKey;
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String thisId = prefs.getString(_clubFavKey);
-    print("favorite $thisId");
   }
 
   _isSearchValueMatch() {
@@ -106,17 +94,70 @@ class _ClubSelectionScreenState extends State<ClubSelectionScreen> {
   }
 }
 
-class ClubsItemList extends StatelessWidget {
+class ClubsItemList extends StatefulWidget {
+  @override
+  _ClubsItemListState createState() => _ClubsItemListState();
+}
+
+class _ClubsItemListState extends State<ClubsItemList> {
+  List clubs;
+
+  @override
+  void initState() {
+//    getIds();
+    _readFavorite();
+    super.initState();
+  }
+
+  String clubFavoriteKey = 'clubFavorite';
+  String clubFavorite = "";
+  bool _clubIsFavorite = false;
+
+  void _readFavorite() async
+  {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    clubFavorite = prefs.getString(clubFavoriteKey);
+    if(clubFavorite==null) clubFavorite = "";
+  }
+
+
+
+  void _markAsFavorite(clubId) async
+  {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    clubFavorite = prefs.getString(clubFavoriteKey);
+    if(clubFavorite==null) clubFavorite = "";
+
+    if(clubFavorite.contains(";"+clubId+";")) {
+      clubFavorite = clubFavorite.replaceAll(";"+clubId+";",";");
+    }
+    else {
+      clubFavorite = clubFavorite + ";"+clubId+";";
+    }
+    clubFavorite = clubFavorite.replaceAll(";;",";"); // cleanup
+
+    prefs.setString(clubFavoriteKey, clubFavorite);
+
+    _clubIsFavorite = clubFavorite.contains(";"+clubId+";");
+    setState(() {
+      clubFavorite=clubFavorite;
+    });
+    isClubFavorite(clubId);
+  }
+
+  bool isClubFavorite(String clubId)
+  {
+    return clubFavorite.contains(";"+clubId+";");
+  }
+
   @override
   Widget build(BuildContext context) {
-    List clubs;
-    final favoriteClub = Provider.of<MarkClubAsFavorite>(context);
-
+//    final favoriteClub = Provider.of<MarkClubAsFavorite>(context);
     return BlocBuilder<ClubsListBloc, ClubsListState>(
       builder: (context, state) {
         if (state is ClubsListEmpty) {
-          favoriteClub.readFavorite();
-          print("favoriteClubs: ${favoriteClub.favoriteClubs}");
+          _readFavorite();
+//          print("favoriteClubs: $favoriteClubs");
           BlocProvider.of<ClubsListBloc>(context).add(FetchClubsList());
         }
         if (state is ClubsListError) {
@@ -125,7 +166,7 @@ class ClubsItemList extends StatelessWidget {
           );
         }
         if (state is ClubsListLoaded) {
-          favoriteClub.readFavorite();
+//          readFavorite();
           return Expanded(
             child: ListView.builder(
               itemCount: state.clubsList.clubs == null
@@ -137,13 +178,13 @@ class ClubsItemList extends StatelessWidget {
                 String clubName = clubs[i]["name"].toLowerCase();
                 String clubAddress = clubs[i]["address"].toLowerCase();
 
-                favoriteClub.readFavorite();
+//                readFavorite();
                 if (_isInputValueMatch == false &&
-                    !favoriteClub.isClubFavorite(clubId)) {
+                    !isClubFavorite(clubId)) {
                   return new Container();
                 } else if (clubName.contains(_filter.toLowerCase()) ||
                     clubAddress.contains(_filter.toLowerCase()) ||
-                    favoriteClub.isClubFavorite(clubId)) {
+                    isClubFavorite(clubId)) {
                   return SingleChildScrollView(
                     child: Hero(
                       tag: 'clubTag$i',
@@ -151,12 +192,11 @@ class ClubsItemList extends StatelessWidget {
                         title: Text(clubs[i]["name"]),
                         subtitle: Text(clubs[i]["address"]),
                         leading: IconButton(
-                          icon: favoriteClub.isClubFavorite(clubId)
+                          icon: isClubFavorite(clubId)
                               ? Icon(Icons.favorite)
                               : Icon(Icons.favorite_border),
                           onPressed: () {
-                            favoriteClub.markClubAsFavorite(clubId);
-                            favoriteClub.readFavorite();
+                            _markAsFavorite(clubId);
                           },
                         ),
                         trailing: Icon(clubs[i]["allow_booking"] == "1"
@@ -170,7 +210,7 @@ class ClubsItemList extends StatelessWidget {
                                 builder: (context) => TimeSelectionScreen(
                                   club: clubs[i],
                                   groundName: clubs[i]
-                                      ["ground_type__description"],
+                                  ["ground_type__description"],
                                   groundTypeId: clubs[i]['id'],
                                   filter: _filter,
                                 ),
