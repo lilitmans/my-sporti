@@ -4,9 +4,7 @@ import '../common/app_bar.dart';
 import '../repositories/repositories.dart';
 import '../screens/confirmation_screen.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../bloc/bloc.dart';
-import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final formKeyReservationData = GlobalKey<FormState>();
 
@@ -27,38 +25,53 @@ class ReservationContactInformationScreen extends StatefulWidget {
 
 class _ReservationContactInformationScreenState
     extends State<ReservationContactInformationScreen> {
-//  String _tappedTime;
+  String cookieKey = "clubId";
   String reservationName;
   String reservationEmail;
   String reservationPhone;
   String dateForServer;
+  TextEditingController _nameController = new TextEditingController();
+  TextEditingController _emailController = new TextEditingController();
+  TextEditingController _phoneController = new TextEditingController();
 
   @override
   void initState() {
     dateForServer = DateFormat('yyyy-MM-dd').format( this.widget.date);
+    _readCookie();
     super.initState();
   }
-//  String _tappedTime;
-//  String tappedTimeForServer;
 
-//  String tappedTimeReadable() {
-//    return _tappedTime.split('|').where((s) => s.isNotEmpty).join("\r\n");
-//  }
-//
-//  @override
-//  void initState() {
-//    date = DateTime.now().toLocal();
-////    _tappedTime = "";
-////    tappedTimeForServer = DateFormat('yyyy-MM-dd – kk:mm').format(date);
-//    super.initState();
-//  }
+  void _readCookie() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    reservationName = prefs.getString("name_"+cookieKey+widget.club["id"]);
+    reservationEmail = prefs.getString("email_"+cookieKey+widget.club["id"]);
+    reservationPhone = prefs.getString("phone_"+cookieKey+widget.club["id"]);
+    if(reservationName == null || reservationEmail == null || reservationPhone == null) {
+      reservationName = "";
+      reservationEmail = "";
+      reservationPhone = "";
+    }
+    setState(() {
+      _nameController = new TextEditingController(text: reservationName);
+      _emailController = new TextEditingController(text: reservationEmail);
+      _phoneController = new TextEditingController(text: reservationPhone);
+    });
+  }
+
+  void _saveCookie() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      prefs.setString("name_"+cookieKey+widget.club['id'], reservationName);
+      prefs.setString("email_"+cookieKey+widget.club['id'], reservationEmail);
+      prefs.setString("phone_"+cookieKey+widget.club['id'], reservationPhone);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     List _tappedTimeList = tappedTimeList;
-//    print("${this.widget.groundTypeId}");
+
     return Scaffold(
-//        resizeToAvoidBottomPadding: false,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: appBar(context, this.widget.club["name"]),
@@ -71,23 +84,24 @@ class _ReservationContactInformationScreenState
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              Text(" "),
               Text("${this.widget.groundName}",
                   style:
                       TextStyle(fontWeight: FontWeight.bold, fontSize: 30.0)),
               Text(" "),
               Text(DateFormat('yyyy-MM-dd').format(this.widget.date)),
-//              this.widget.receivedDate
               Text(" "),
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: _tappedTimeList
-                    .map((i) => Text(i,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        )))
+                    .map((i) => Center(
+                  child: Text(i.replaceAll("|","\n"),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      )),
+                ))
                     .toList(),
               ),
-              SizedBox(height: 25),
               Form(
                   key: formKeyReservationData,
                   child: Padding(
@@ -97,6 +111,7 @@ class _ReservationContactInformationScreenState
                         children: <Widget>[
                           TextFormField(
                             decoration: InputDecoration(labelText: 'Name'),
+                            controller: _nameController,
                             validator: (value) {
                               reservationName = value;
                               if (value.isEmpty) {
@@ -108,6 +123,7 @@ class _ReservationContactInformationScreenState
                           TextFormField(
                             decoration:
                                 InputDecoration(labelText: 'E-Mail Adresse'),
+                            controller: _emailController,
                             validator: (value) {
                               reservationEmail = value;
                               if (value.isEmpty) {
@@ -119,6 +135,7 @@ class _ReservationContactInformationScreenState
                           TextFormField(
                             decoration:
                                 InputDecoration(labelText: 'Telefonnummer'),
+                            controller: _phoneController,
                             validator: (value) {
                               reservationPhone = value;
                               if (value.isEmpty) {
@@ -137,6 +154,7 @@ class _ReservationContactInformationScreenState
                             onPressed: () {
                               if (formKeyReservationData.currentState
                                   .validate()) {
+                                _saveCookie();
                                 Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -164,10 +182,6 @@ class _ReservationContactInformationScreenState
           ),
         ),
       ),
-      /*floatingActionButton: FloatingActionButton(
-          onPressed: _backToStartPage,
-          child: new Image.asset('images/logo.png'),
-        ),*/
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.pop(context);

@@ -7,10 +7,7 @@ import '../repositories/repositories.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/bloc.dart';
 import '../screens/reservation_contact_information_screen.dart';
-import '../screens/reservation-pin-screen.dart';
-import 'package:provider/provider.dart';
 
-//_TimeSelectionScreenState _globalState = _TimeSelectionScreenState();
 class TimeSelectionScreen extends StatefulWidget {
   final Map<String, dynamic> club;
   final String groundName;
@@ -22,9 +19,6 @@ class TimeSelectionScreen extends StatefulWidget {
   @override
 
   _TimeSelectionScreenState createState() => _TimeSelectionScreenState();
-//  _TimeSelectionScreenState _globalState = _TimeSelectionScreenState();
-//  _TimeSelectionScreenState createState() => _globalState;
-
 }
 
 class _TimeSelectionScreenState extends State<TimeSelectionScreen> {
@@ -51,25 +45,14 @@ class _TimeSelectionScreenState extends State<TimeSelectionScreen> {
       tappedTimeForServer = tappedTimeForServerChild;
     });
   }
-
-  @override
-  void deactivate() {
-//    reservationTimeList.removeLast();
-//      tappedTime.isEmpty;
-//      tappedTimeForServer.re;
-
-    super.deactivate();
-  }
   bool status = true;
 
   @override
   Widget build(BuildContext context) {
-//    List reservationTimeList;
   if(status) {
     BlocProvider.of<ReservationTimeListBloc>(context).add(
         FetchReservationTimeList(
             clubId: clubId,
-//            groundTypeId: this.widget.club["ground_type__id"],
             groundTypeId: this.widget.groundTypeId,
             date: date));
     tappedTimeList = [];
@@ -155,7 +138,7 @@ class _TimeSelectionScreenState extends State<TimeSelectionScreen> {
             onPressed: () {
 
               if (tappedTimeList.length > 0 && tappedTime != "") {
-                if (this.widget.club["allow_booking"] == "1") {
+//                if (this.widget.club["allow_booking"] == "1") {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -168,19 +151,19 @@ class _TimeSelectionScreenState extends State<TimeSelectionScreen> {
                       ),
                     ),
                   );
-                } else {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ReservationPinScreen(
-                        club: this.widget.club,
-                        date: date,
-                        tappedTimeForServer: tappedTimeForServer,
-                        reservationTimeList: reservationTimeList,
-                      ),
-                    ),
-                  );
-                }
+//                } else {
+//                  Navigator.push(
+//                    context,
+//                    MaterialPageRoute(
+//                      builder: (context) => ReservationPinScreen(
+//                        club: this.widget.club,
+//                        date: date,
+//                        tappedTimeForServer: tappedTimeForServer,
+//                        reservationTimeList: reservationTimeList,
+//                      ),
+//                    ),
+//                  );
+//                }
               }
             },
             child: new Icon(Icons.arrow_forward_ios),

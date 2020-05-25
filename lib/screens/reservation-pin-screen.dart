@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import '../common/app_bar.dart';
 import '../screens/confirmation_screen.dart';
 import '../repositories/repositories.dart';
-import '../models/models.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final _formKeyReservationData = GlobalKey<FormState>();
